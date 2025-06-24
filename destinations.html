@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="https://www.ncl.com/favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <title>NCL Platinum Quiz</title>
+  <style>
+    /* === GLOBAL STYLES === */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f6f3;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+      color: #2196f3;
+    }
+    /* === NAVIGATION BAR STYLES === */
+    .navbar {
+      width: 100vw;
+      background: #e2eaf4;
+      box-shadow: 0 2px 8px #7b807e1a;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 200;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 64px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-size: 12px;
+    }
+    .navbar-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+      padding: 0 32px;
+      justify-content: center;
+      position: relative;
+    }
+    .navbar-links {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      align-items: center;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1em;
+    }
+    .navbar-links li a {
+      color: #2196f3;
+      text-decoration: none;
+      transition: color 0.2s;
+      padding: 8px 10px;
+      border-radius: 4px;
+    }
+    .navbar-links li a:hover, .navbar-links li a:focus {
+      background: #d2e2f9;
+      color: #0b73d9;
+    }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      margin-left: 20px;
+      background: none;
+      border: none;
+      z-index: 300;
+    }
+    .hamburger span {
+      height: 4px;
+      width: 30px;
+      background: #2196f3;
+      margin: 5px 0;
+      border-radius: 2px;
+      transition: all 0.3s;
+      display: block;
+    }
+    /* === RESPONSIVE NAVIGATION BAR === */
+    @media (max-width: 700px) {
+      .navbar-content {
+        padding: 0 12px;
+      }
+      .navbar-links {
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: #e2eaf4;
+        flex-direction: column;
+        gap: 0;
+        align-items: center;
+        display: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        box-shadow: 0 2px 12px #7b807e47;
+      }
+      .navbar-links.show {
+        display: flex;
+        animation: slideDown 0.2s;
+      }
+      .navbar-links li {
+        margin: 0;
+        width: 100%;
+      }
+      .navbar-links li a {
+        display: block;
+        width: 100%;
+        padding: 16px 0;
+        text-align: center;
+      }
+      .hamburger {
+        display: flex;
+        position: absolute;
+        right: 0;
+        top: 18px;
+      }
+      @keyframes slideDown {
+        from {transform: translateY(-20px); opacity:0;}
+        to {transform: none; opacity: 1;}
+      }
+    }
+    /* === MAIN LAYOUT PADDING FOR NAVBAR === */
+    #main-layout {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      margin-top: 80px;
+    }
+    /* === QUIZ CONTAINER STYLES === */
+    #quiz-container {
+      background: linear-gradient(135deg, #e3f6e8 0%, #d5eaf6 100%);
+      padding: 38px 32px 32px 32px;
+      max-width: 520px;
+      margin: auto;
+      border-radius: 28px;
+      box-shadow:
+        0 4px 24px 0 rgba(112, 175, 145, 0.20),
+        0 1.5px 8px 0 rgba(70, 130, 180, 0.15);
+      border: 2px solid #c2e1d6;
+      transition: box-shadow 0.3s;
+    }
+    #quiz-container:hover, #quiz-container:focus-within {
+      box-shadow:
+        0 6px 32px 0 rgba(112, 175, 145, 0.25),
+        0 3px 16px 0 rgba(70, 130, 180, 0.18);
+    }
+    #question {
+      font-size: 1.25em;
+      margin-bottom: 24px;
+      color: #25623d;
+      font-family: Arial, sans-serif;
+      letter-spacing: 1px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1.07em;
+    }
+    button {
+      margin-top: 22px;
+      padding: 10px 22px;
+      background: linear-gradient(90deg, #a7e8bd 0%, #98cbe8 100%);
+      color: #25623d;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1em;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px #8fc8b1a0;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    button:hover, button:focus {
+      background: linear-gradient(90deg, #baf2d7 0%, #b8e3fc 100%);
+      color: #1b4332;
+    }
+    /* === QUIZ ANSWER OPTION STYLES === */
+    .answer-label {
+      cursor: pointer;
+      transition: color 0.2s, font-weight 0.2s;
+    }
+    .answer-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      cursor: pointer;
+      background: #eefaf4;
+      border-radius: 10px;
+      padding: 7px 12px;
+      transition: background 0.2s;
+    }
+    .answer-option:hover {
+      background: #d3f0e1;
+    }
+    .answer-option input[type="radio"] {
+      margin-right: 13px;
+      accent-color: #64c5a1;
+    }
+    /* Highlight the correct answer when wrong is chosen */
+    .answer-label.correct-highlight {
+      color: #ff9800 !important;
+      font-weight: bold !important;
+    }
+    /* === FEEDBACK STYLES === */
+    #feedback.correct {
+      color: #41b883;
+      font-weight: bold;
+      margin-top: 16px;
+      font-size: 1.12em;
+      letter-spacing: 0.5px;
+    }
+    #feedback.incorrect {
+      color: #e64e4e;
+      font-weight: bold;
+      margin-top: 16px;
+      font-size: 1.12em;
+      letter-spacing: 0.5px;
+    }
+    /* === THERMOMETER STYLES === */
+    #meter-container {
+      margin-left: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 220px;
+      justify-content: flex-start;
+    }
+    .thermometer {
+      position: relative;
+      width: 30px;
+      height: 200px;
+      background: #E2EAF4;
+      border-radius: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      box-shadow: 0 2px 10px #7B807E;
+    }
+    .thermo-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #2196f3;
+      border-radius: 0 0 15px 15px;
+      transition: height 0.4s cubic-bezier(.4,2,.6,1);
+    }
+    .thermo-bulb {
+      width: 50px;
+      height: 50px;
+      background: #2196f3;
+      border-radius: 50%;
+      border: 8px solid #E2EAF4;
+      margin-top: -18px;
+      box-sizing: border-box;
+      z-index: 1;
+      box-shadow: 0 2px 10px #7B807E;
+    }
+    #meter-label {
+      margin-top: 8px;
+      font-size: 1em;
+      font-weight: bold;
+      color: #2196f3;
+    }
+  </style>
+</head>
+<body>
+  <!-- === NAVIGATION BAR === -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <ul class="navbar-links" id="navbarLinks">
+        <li><a href="officers.html">OFFICERS</a></li>
+        <li><a href="destinations.html">DESTINATIONS</a></li>
+        <li><a href="platinum.html">PLATINUM IMPRESSIONS</a></li>
+      </ul>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+  <div id="main-layout">
+    <div id="quiz-container">
+      <h2>NCL DESTINATIONS QUIZ</h2>
+      <div id="question"></div>
+      <form id="answers"></form>
+      <div id="feedback"></div>
+      <button id="next-btn" style="display:none;">Next Question</button>
+    </div>
+    <div id="meter-container">
+      <div class="thermometer">
+        <div id="thermo-fill" class="thermo-fill" style="height: 0;"></div>
+      </div>
+      <div class="thermo-bulb"></div>
+      <div id="meter-label">0 / 0</div>
+    </div>
+  </div>
+  <script>
+    // ========== NAVBAR LOGIC ==========
+    const hamburger = document.getElementById('hamburgerBtn');
+    const navbarLinks = document.getElementById('navbarLinks');
+    hamburger.addEventListener('click', function() {
+      const shown = navbarLinks.classList.toggle('show');
+      this.setAttribute('aria-expanded', shown ? 'true' : 'false');
+    });
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 700) {
+        navbarLinks.classList.remove('show');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // ========== QUIZ LOGIC ==========
+
+    let current = 0; // The current question index
+    let score = 0;   // Number of correct answers
+
+    // --- Define the quiz questions and answers ---
+    const questions = [
+      {
+        question: "Where is the Norwegian Aqua crusing?",
+        answers: ["East Caribbean", "Alaska", "Baltic Capitals", "Bahamas"],
+        correct: 1
+      },
+      {
+        question: "Where is the Norwegian Gem crusing?",
+        answers: ["Bermuda", "Bahamas", "Mediterranean", "Nothern Europe"],
+        correct: 2
+      },
+      {
+        question: "Where is the Norwegian Viva crusing?",
+        answers: ["Hawaii/Alaska (Fire and Ice)", "Alaska", "Bahamas", "Greek Isles/Mediterranean"],
+        correct: 3
+      },
+      {
+        question: "Where is the Norwegian Spirit crusing?",
+        answers: ["Asia", "Northern Europe", "West Caribbean", "South Africa"],
+        correct: 0
+      },
+      {
+        question: "Where is the Norwegian Sky crusing?",
+        answers: ["Northern Europe", "Asia", "Bermuda", "Mediterranean"],
+        correct: 3
+      },
+      {
+        question: "Where is the Norwegian Prima crusing?",
+        answers: ["West Africa", "Northern Europe", "East Caribbean", "Central America"],
+        correct: 1
+      },
+    ];
+
+    // --- Array of positive feedback messages ---
+    const positiveFeedback = [
+      "Good job!",
+      "Well done!",
+      "Nice work!",
+      "You nailed it!",
+      "Excellent!",
+      "Great answer!",
+      "Superb!",
+      "Fantastic!"
+    ];
+
+    // --- Update the thermometer meter ---
+    function updateMeter() {
+      const answered = current;
+      const total = questions.length;
+      const meterLabel = document.getElementById("meter-label");
+      meterLabel.textContent = `${answered} / ${total}`;
+      // 200px is the total height of thermometer
+      const fillPercent = Math.max(0, Math.min(1, answered / total));
+      const fillHeight = Math.round(200 * fillPercent);
+      document.getElementById("thermo-fill").style.height = fillHeight + "px";
+    }
+
+    // --- Load the current question and its answers ---
+    function loadQuestion() {
+      const questionContainer = document.getElementById("question");
+      const answersContainer = document.getElementById("answers");
+      const feedback = document.getElementById("feedback");
+      const nextBtn = document.getElementById("next-btn");
+
+      feedback.innerText = "";
+      feedback.className = "";
+      nextBtn.style.display = "none";
+      nextBtn.innerText = "Next Question";
+
+      questionContainer.innerText = questions[current].question;
+      answersContainer.innerHTML = "";
+
+      questions[current].answers.forEach((answer, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "answer-option";
+
+        // Radio input for answer selection
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "quiz";
+        radio.id = `answer-${index}`;
+        radio.onclick = () => showFeedback(index, questions[current].correct);
+
+        // Label for the radio input
+        const label = document.createElement("label");
+        label.htmlFor = `answer-${index}`;
+        label.innerText = answer;
+        label.className = "answer-label";
+        if (index === questions[current].correct) {
+          label.dataset.correct = "true";
+        }
+
+        wrapper.appendChild(radio);
+        wrapper.appendChild(label);
+        answersContainer.appendChild(wrapper);
+      });
+
+      updateMeter();
+    }
+
+    // --- Show feedback for user's answer ---
+    function showFeedback(selected, correct) {
+      const feedback = document.getElementById("feedback");
+
+      // Remove previous highlighting, if any
+      document.querySelectorAll('.answer-label').forEach(label => {
+        label.classList.remove('correct-highlight');
+      });
+
+      if (selected === correct) {
+        // User answered correctly
+        const praise = positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)];
+        feedback.innerText = `Correct! ${praise}`;
+        feedback.className = "correct";
+        score++;
+      } else {
+        // User answered incorrectly
+        feedback.innerText = "Incorrect answer";
+        feedback.className = "incorrect";
+        // Highlight the correct answer
+        const correctLabel = document.querySelector('.answer-label[data-correct="true"]');
+        if (correctLabel) {
+          correctLabel.classList.add('correct-highlight');
+        }
+      }
+      // Disable further selection of answers
+      document.querySelectorAll('input[name="quiz"]').forEach(input => input.disabled = true);
+
+      // Show "Next Question" button
+      const nextBtn = document.getElementById("next-btn");
+      nextBtn.style.display = "inline-block";
+    }
+
+    // --- Next Question Button Logic ---
+    document.getElementById("next-btn").onclick = function(e) {
+      e.preventDefault();
+      current++;
+      if (current < questions.length) {
+        loadQuestion();
+      } else {
+        // Final meter update and show score
+        updateMeter();
+        document.getElementById("quiz-container").innerHTML = `
+          <h2>Quiz completed!</h2>
+          <p>You got ${score} out of ${questions.length} correct.</p>
+        `;
+      }
+      updateMeter();
+    };
+
+    // --- Initialize the quiz on page load ---
+    window.onload = function() {
+      // Set the total questions on the meter at start
+      document.getElementById("meter-label").textContent = `0 / ${questions.length}`;
+      loadQuestion();
+    };
+  </script>
+</body>
+</html>
